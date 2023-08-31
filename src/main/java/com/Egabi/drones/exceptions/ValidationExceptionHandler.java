@@ -47,6 +47,6 @@ public class ValidationExceptionHandler {
     public ResponseEntity<Object> handleDroneNotAvailable(DroneNotAvailableException ex){
         Map<String, String> errors = new LinkedHashMap<>();
         errors.put("message", ex.getMessage());
-        return new ResponseEntity<>(errors, HttpStatus.METHOD_NOT_ALLOWED);
+        return new ResponseEntity<>(errors, HttpStatus.LOCKED);
     }
 }
