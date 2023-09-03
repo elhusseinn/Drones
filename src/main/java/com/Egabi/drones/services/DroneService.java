@@ -69,16 +69,14 @@ public class DroneService {
          * throws DroneNotAvailableException(double weightLimit, double weight)
          */
 
-        List<Medication> loadedMedications = drone.getMedications();
-        Double currentLoadedWeight = 0.0;
-        for(Medication medication:loadedMedications){
-            currentLoadedWeight+=medication.getWeight();
-        }
-        Double weightAfterLoading = 0.0;
-        for(Medication medication:medications){
-            weightAfterLoading += medication.getWeight();
-        }
-        weightAfterLoading += currentLoadedWeight;
+        Double currentLoadedWeight = currentMedications.stream()
+                                    .mapToDouble(Medication::getWeight)
+                                    .sum();
+
+        Double weightAfterLoading = medications.stream()
+                                    .mapToDouble(Medication::getWeight)
+                                    .sum();
+        weightAfterLoading+=currentLoadedWeight;
         if(weightAfterLoading > drone.getWeightLimit()){throw new DroneNotAvailableException(drone.getWeightLimit(), weightAfterLoading);}
 
         /**
@@ -91,10 +89,10 @@ public class DroneService {
 
         drone.setMedications(new ArrayList<>(medications));
 
-        for(Medication medication:medications){
+        medications.forEach(medication -> {
             medication.setDrone(drone);
             medicationRepo.save(medication);
-        }
+        });
 
         return updateDrone(droneId, droneMapper.toDronePOJO(drone));
 
