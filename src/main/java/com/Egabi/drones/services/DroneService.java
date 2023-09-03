@@ -58,10 +58,9 @@ public class DroneService {
         List<Medication> currentMedications = drone.getMedications(); // current medications that already exist in the drone
         Set<Medication> medications = new HashSet<>();
 
-        for(Long medicationId :medicationIds){
-            Medication medication = medicationRepo.findById(medicationId).orElseThrow(()->new EntityNotFoundException("medication with ID "+medicationId+" doesn't exist"));
-            medications.add(medication);
-        }
+        medicationIds.forEach(medicationId->{
+            medications.add(medicationRepo.findById(medicationId).orElseThrow(()->new EntityNotFoundException("medication with ID "+medicationId+" doesn't exist")));
+        });
 
         /**
          * check the drone if it's carrying any medications and add them,
