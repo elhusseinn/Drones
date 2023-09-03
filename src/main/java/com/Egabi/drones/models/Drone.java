@@ -3,16 +3,15 @@ package com.Egabi.drones.models;
 
 import com.Egabi.drones.enums.DroneModelEnum;
 import com.Egabi.drones.enums.DroneStateEnum;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name="drones")
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Drone{
@@ -23,14 +22,13 @@ public class Drone{
     private Long serialNumber;
     @Enumerated(EnumType.STRING)
     private DroneModelEnum model;
-    private double weightLimit;
-    private int batteryCapacity;
+    private Double weightLimit;
+    private Integer batteryCapacity;
 
     @Enumerated(EnumType.STRING)
     private DroneStateEnum state;
 
-    @OneToMany(mappedBy ="drone", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy ="drone", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Medication> medications;
-
 
 }

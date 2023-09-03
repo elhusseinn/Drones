@@ -3,9 +3,7 @@ package com.Egabi.drones.pojos;
 import com.Egabi.drones.enums.DroneModelEnum;
 import com.Egabi.drones.enums.DroneStateEnum;
 import com.Egabi.drones.models.Medication;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.Max;
@@ -20,9 +18,9 @@ public class DronePOJO {
     private Long serialNumber;
     private DroneModelEnum model;
     @Max(500)
-    private double weightLimit;
+    private Double weightLimit;
     @Range(min = 0, max = 100)
-    private int batteryCapacity;
+    private Integer batteryCapacity;
     private DroneStateEnum state;
     private List<Medication> medications;
 

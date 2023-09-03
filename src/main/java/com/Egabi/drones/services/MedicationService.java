@@ -8,6 +8,7 @@ import com.Egabi.drones.utils.BasicHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,32 +36,30 @@ public class MedicationService {
     }
 
     public MedicationPOJO updateMedication(Long id, MedicationPOJO medicationPOJO){ //TODO:8yr al khara da
+        Medication medication = medicationRepo.findById(id).orElseThrow(()->new EntityNotFoundException("medication with Id "+id+" doesn't exist"));
+
+        if(medicationPOJO.getCode()!=null) medication.setCode(medicationPOJO.getCode());
+        if(medicationPOJO.getName()!=null) medication.setName(medicationPOJO.getName());
+        if(medicationPOJO.getImage()!=null) medication.setImage(medicationPOJO.getImage());
+        if(medicationPOJO.getWeight()!=null) medication.setWeight(medicationPOJO.getWeight());
+//        if(medicationPOJO.getDrone()!=null) medication.setDrone(medicationPOJO.getDrone());
+        medicationRepo.save(medication);
+        return medicationMapper.toMedicationPOJO(medication);
+    }
+
+    public MedicationPOJO updateMedicationNew(Long id, MedicationPOJO medicationPOJO) throws Exception {
         Optional<Medication> oldMedication = medicationRepo.findById(id);
         if(oldMedication.isPresent()){
+//            Medication updatedMedication = medicationMapper.toMedication((MedicationPOJO) BasicHelper.updateObject(medicationMapper.toMedicationPOJO(oldMedication.get()), medicationPOJO));
             Medication updatedMedication = oldMedication.get();
-            if(medicationPOJO.getCode()!=null) updatedMedication.setCode(medicationPOJO.getCode());
-            if(medicationPOJO.getName()!=null) updatedMedication.setName(medicationPOJO.getName());
-            if(medicationPOJO.getImage()!=null) updatedMedication.setImage(medicationPOJO.getImage());
-            if(medicationPOJO.getWeight()!=null) updatedMedication.setWeight(medicationPOJO.getWeight());
-            medicationRepo.save(updatedMedication);
-            return medicationMapper.toMedicationPOJO(updatedMedication);
+            MedicationPOJO updatedMedicationPOJO = medicationMapper.toMedicationPOJO(updatedMedication);
+            updatedMedicationPOJO = (MedicationPOJO) BasicHelper.updateObject(updatedMedicationPOJO, medicationPOJO);
+            medicationRepo.save(medicationMapper.toMedication(updatedMedicationPOJO));
+            return updatedMedicationPOJO;
+
         }
         return null;
     }
-
-//    public MedicationPOJO updateMedicationNew(Long id, MedicationPOJO medicationPOJO) throws Exception {
-//        Optional<Medication> oldMedication = medicationRepo.findById(id);
-//        if(oldMedication.isPresent()){
-////            Medication updatedMedication = medicationMapper.toMedication((MedicationPOJO) BasicHelper.updateObject(medicationMapper.toMedicationPOJO(oldMedication.get()), medicationPOJO));
-//            Medication updatedMedication = oldMedication.get();
-//            MedicationPOJO updatedMedicationPOJO = medicationMapper.toMedicationPOJO(updatedMedication);
-//            updatedMedicationPOJO = (MedicationPOJO) BasicHelper.updateObject(updatedMedicationPOJO, medicationPOJO);
-//            medicationRepo.save(medicationMapper.toMedication(updatedMedicationPOJO));
-//            return updatedMedicationPOJO;
-//
-//        }
-//        return null;
-//    }
 
 
 }

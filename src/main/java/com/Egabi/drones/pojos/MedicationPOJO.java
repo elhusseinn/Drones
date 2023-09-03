@@ -1,10 +1,10 @@
 package com.Egabi.drones.pojos;
 
 import com.Egabi.drones.models.Drone;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import javax.validation.constraints.Pattern;
+import java.util.Arrays;
 
 @Data
 @AllArgsConstructor
