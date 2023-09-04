@@ -9,13 +9,20 @@ import com.Egabi.drones.pojos.DronePOJO;
 import com.Egabi.drones.pojos.LoadDroneRequestPOJO;
 import com.Egabi.drones.repositories.DroneRepo;
 import com.Egabi.drones.repositories.MedicationRepo;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.hql.internal.ast.SqlASTFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+
+
 @Service
+@Slf4j
 public class DroneService {
     @Autowired
     private DroneRepo droneRepo;
@@ -51,7 +58,6 @@ public class DroneService {
 
         // check drone status if ready to load
         if(drone.getState()!= DroneStateEnum.IDLE && drone.getState() != DroneStateEnum.LOADING){throw new DroneNotAvailableException(droneId);}
-
         //check for the drone battery percentage > 25? throws DroneNotAvailableException(long id, int batteryPercentage)
         if(drone.getBatteryCapacity() <= 25){throw new DroneNotAvailableException(droneId, drone.getBatteryCapacity());}
 
@@ -94,6 +100,41 @@ public class DroneService {
         });
 
         return updateDrone(droneId, droneMapper.toDronePOJO(drone));
+    }
+
+    public void deliverDrone(Long id){
+        Drone drone = droneRepo.findById(id).orElseThrow(()->new EntityNotFoundException("drone with ID "+id+" doesn't exist"));
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        currentTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+        int batteryCapacity = drone.getBatteryCapacity();
+
+        drone.setState(DroneStateEnum.LOADED);
+        drone.setBatteryCapacity((int) (batteryCapacity*=0.95));
+        log.info("Drone: "+id+" is done loading at: "+currentTime+" with battery capacity: "+ batteryCapacity);
+
+        drone.setState(DroneStateEnum.DELIVERING);
+        drone.setBatteryCapacity((int) (batteryCapacity*=0.95));
+        log.info("Drone: "+id+" is now delivering at: "+currentTime.plusMinutes(10)+" with battery capacity: "+ batteryCapacity);
+
+        drone.setState(DroneStateEnum.DELIVERED);
+        drone.setBatteryCapacity((int) (batteryCapacity*=0.95));
+        log.info("Drone: "+id+" is done delivering at: "+currentTime.plusMinutes(20)+" with battery capacity: "+ batteryCapacity);
+
+        drone.setState(DroneStateEnum.RETURNING);
+        drone.setBatteryCapacity((int) (batteryCapacity*=0.95));
+        log.info("Drone: "+id+" is now returning at: "+currentTime.plusMinutes(30)+" with battery capacity: "+ batteryCapacity);
+
+        drone.setState(DroneStateEnum.IDLE);
+        drone.getMedications().forEach(medication->{
+            medication.setDrone(null);
+            medicationRepo.save(medication);
+        });
+        log.info("Drone: "+id+" has returned and ready to be loaded: "+currentTime.plusMinutes(40)+" with battery capacity: "+ batteryCapacity);
+
+        droneRepo.save(drone);
 
     }
+
+
 }

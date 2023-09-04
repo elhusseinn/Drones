@@ -26,4 +26,9 @@ public class DroneController {
     public DronePOJO getDroneById(@PathVariable Long id){
         return droneService.getDroneById(id);
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/deliver/{id}")
+    public void deliverDrone(@PathVariable Long id){
+        droneService.deliverDrone(id);
+    }
 }
